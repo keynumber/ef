@@ -5,8 +5,7 @@
 
 #include "poller.h"
 
-#include <malloc.h>
-#include <assert.h>
+#include <cassert>
 
 #include "macro.h"
 
@@ -19,13 +18,13 @@ Poller::Poller(int max_event_num)
 {
     _epoll_fd = epoll_create(1);
     assert(_epoll_fd >= 0);
-    _events = (struct epoll_event*)malloc(max_event_num * sizeof(struct epoll_event));
+    _events =  new struct epoll_event[max_event_num];
     assert(_events != nullptr);
 }
 
 Poller::~Poller()
 {
-    free(_events);
+    delete []_events;
 }
 
 int Poller::Add(int fd, uint64_t key, uint32_t events)

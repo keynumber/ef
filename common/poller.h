@@ -6,7 +6,7 @@
 #ifndef __COMMON_POLLER_H_H___
 #define __COMMON_POLLER_H_H___
 
-#include <stdint.h>
+#include <cstdint>
 
 #include <sys/epoll.h>
 

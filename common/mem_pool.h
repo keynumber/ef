@@ -7,10 +7,9 @@
 #define __COMMON_MEM_POOL_H_H___
 
 #include <cstdint>
-#include <vector>
-#include <stack>
+#include <queue>
 
-// TODO line 30, use a thread safe queue to replace std::stack, line 12 to be deleted
+// TODO line 29, use a thread safe queue to replace std::stack, line 10 to be deleted
 
 #define MEMPOOL_DEFAULT_GAP 128
 #define MEMPOOL_DEFAULT_MEMBLOCK_MAX_SIZE 102400
@@ -19,7 +18,7 @@ namespace ef {
 
 class MemPool {
 public:
-    MemPool(uint32_t min_size, uint32_t max_size = MEMPOOL_DEFAULT_GAP,
+    MemPool(uint32_t min_buf_size, uint32_t max_buf_size = MEMPOOL_DEFAULT_GAP,
             uint32_t gap = MEMPOOL_DEFAULT_MEMBLOCK_MAX_SIZE);
     virtual ~MemPool();
     void * Malloc(int size);
@@ -27,7 +26,7 @@ public:
     void Shrink();
 
 private:
-    typedef std::stack<char*> queue;
+    typedef std::queue<char*> queue;
     struct mem_chain_t {
         uint32_t mem_size;
         uint32_t min_queue_size;
@@ -35,10 +34,11 @@ private:
     };
 
 private:
-    std::vector<mem_chain_t> _mem_pool;
-    uint32_t _min_size;
-    uint32_t _max_size;
-    uint32_t _gap;
+    mem_chain_t *_mem_pool;
+    const uint32_t _pool_size;
+    const uint32_t _min_buf_size;
+    const uint32_t _max_buf_size;
+    const uint32_t _gap;
 
 };
 
