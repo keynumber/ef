@@ -1,0 +1,70 @@
+/*
+ * Author: number
+ * Date  : Nov 1, 2015
+ */
+
+#include "poller.h"
+
+#include <malloc.h>
+#include <assert.h>
+
+#include "macro.h"
+
+namespace ef {
+
+Poller::Poller(int max_event_num)
+    : _max_event_num(max_event_num)
+    , _event_num(0)
+    , _cur_index(0)
+{
+    _epoll_fd = epoll_create(1);
+    assert(_epoll_fd >= 0);
+    _events = (struct epoll_event*)malloc(max_event_num * sizeof(struct epoll_event));
+    assert(_events != nullptr);
+}
+
+Poller::~Poller()
+{
+    free(_events);
+}
+
+int Poller::Add(int fd, uint64_t key, uint32_t events)
+{
+    return Ctrl(fd, key, EPOLL_CTL_ADD, events);
+}
+
+int Poller::Modify(int fd, uint64_t key, uint32_t events)
+{
+    return Ctrl(fd, key, EPOLL_CTL_MOD, events);
+}
+
+int Poller::Del(int fd)
+{
+    return Ctrl(fd, 0, EPOLL_CTL_DEL, 0);
+}
+
+int Poller::GetEvent(uint64_t *key, uint32_t *events)
+{
+    if (_cur_index < _event_num) {
+        *key = _events[_cur_index].data.u64;
+        *events = _events[_cur_index].events;
+        ++_cur_index;
+        return 0;
+    }
+    return -1;
+}
+
+int Poller::Wait(int time_ms)
+{
+    return epoll_wait(_epoll_fd, &_events[0], _max_event_num, time_ms);
+}
+
+int Poller::Ctrl(int fd, uint64_t key, int op, uint32_t events)
+{
+    struct epoll_event event;
+    event.events = events;
+    event.data.u64 = key;
+    return epoll_ctl(_epoll_fd, op, fd, &event);
+}
+
+} /* namespace ef */
