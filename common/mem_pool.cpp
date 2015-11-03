@@ -16,7 +16,7 @@ MemPool::MemPool(uint32_t min_buf_size, uint32_t max_buf_size, uint32_t gap)
 {
     _mem_pool = new mem_chain_t[_pool_size];
     assert(_mem_pool != nullptr);
-    int mem_size = min_buf_size;
+    uint32_t mem_size = min_buf_size;
     for (uint32_t i = 0; i < _pool_size; ++i) {
         _mem_pool[i].mem_size = mem_size;
         _mem_pool[i].min_queue_size = 0;

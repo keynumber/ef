@@ -70,6 +70,15 @@ void TestGetTimeofday()
     }
 }
 
+void TestTime()
+{
+    puts("1000,0000 times time(NULL)");
+    int n = 10000000;
+    ef::TimeCounter counter;
+    for (int i=0; i<n; i++) {
+        time(NULL);
+    }
+}
 void TestAtomicInt()
 {
     puts("1000,0000 times std atomic_int add");
@@ -81,12 +90,26 @@ void TestAtomicInt()
     }
 }
 
+class A {
+};
+
+void TestEmptyObject()
+{
+    puts("1000,0000 times empty object create");
+    int n = 10000000;
+    ef::TimeCounter counter;
+    for (int i=0; i<n; i++) {
+        A a;
+    }
+}
 int main(int argc, char *argv[])
 {
     TestStdMutex();
     TestGetTimeofday();
     TestNewAndDelete();
     TestAtomicInt();
+    TestEmptyObject();
+    TestTime();
     return 0;
 }
 
