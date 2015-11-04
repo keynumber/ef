@@ -1,12 +1,13 @@
 CXX = g++
-WARNING_FALGS = -Wreturn-type -Wunused-value -Wunused-parameter -Wsign-conversion
+WARNING_FALGS = -Wreturn-type -Wunused-value -Wunused-parameter -Wsign-conversion -Wparentheses
 CXXFLAGS = -std=c++11 -pthread -O2 -g -Wall -fmessage-length=0
 CXXFLAGS += $(WARNING_FALGS)
 
 OBJS = easyframe.o 				\
 	   common/mem_pool.o 		\
 	   common/poller.o			\
-	   common/logger.o
+	   common/logger.o			\
+	   common/shift_writer.o
 
 LIBS =
 

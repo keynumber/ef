@@ -5,17 +5,119 @@
 
 #include "shift_writer.h"
 
+#include <stdio.h>
+#include <errno.h>
+
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/fcntl.h>
+#include <unistd.h>
+
 namespace ef {
 
-ShiftWriter::ShiftWriter()
+ShiftWriter::ShiftWriter(const char* path, uint32_t max_file_size,
+        uint32_t max_file_number, const char *suffix)
+    : _fd(-1)
+    , _path(path)
+    , _suffix(suffix)
+    , _max_file_size(max_file_size)
+    , _max_file_num(max_file_number)
+    , _cur_file_size(0)
 {
-    // TODO Auto-generated constructor stub
-
 }
 
 ShiftWriter::~ShiftWriter()
 {
-    // TODO Auto-generated destructor stub
+    if (_fd >= 0) {
+        close(_fd);
+        _fd = -1;
+    }
+}
+
+int ShiftWriter::Initialize()
+{
+    char file[256];
+    snprintf(file, 256, "%s%d%s", _path.c_str(), 0, _suffix.c_str());
+    _fd = open(file,
+            O_CREAT | O_APPEND | O_WRONLY | O_NOFOLLOW | O_NOCTTY,
+            S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
+    if (_fd < 0) {
+        return errno;
+    }
+    return 0;
+}
+
+int ShiftWriter::Write(void* buf, uint32_t len)
+{
+    if (_cur_file_size > _max_file_size) {
+        Shift();
+    }
+
+    if (_fd < 0) {
+        char file[256];
+        snprintf(file, 256, "%s%d%s", _path.c_str(), 0, _suffix.c_str());
+        _fd = open(file,
+                O_CREAT | O_APPEND | O_WRONLY | O_NOFOLLOW | O_NOCTTY,
+                S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
+        if (_fd < 0) {
+            return errno;
+        }
+    }
+
+    int ret = 0;
+    do {
+        ret = write(_fd, buf, len);
+    } while (ret < 0 && errno == EINTR);
+
+    _cur_file_size += len;
+
+    return ret;
+}
+
+void ShiftWriter::Shift()
+{
+    if (_fd >= 0) {
+        close(_fd);
+        _fd = -1;
+    }
+
+    char new_file[256];
+    char old_file[256];
+    for (int i = (int)_max_file_num - 2; i >= 0; --i) {
+        snprintf(old_file, 256, "%s%d%s", _path.c_str(), i, _suffix.c_str());
+        if (access(old_file, F_OK) != 0) {
+            continue;
+        }
+
+        snprintf(new_file, 256, "%s%d%s", _path.c_str(), i+1, _suffix.c_str());
+        rename(old_file, new_file);
+    }
+
+    _cur_file_size = 0;
 }
 
 } /* namespace ef */
+
+#if 0
+
+#include <string.h>
+
+int main(int argc, char *argv[])
+{
+    // ef::ShiftWriter writer("/home/test_shift_write", 500, 5);
+    ef::ShiftWriter writer("/home/number/test_shift_write", 500, 5);
+    int ret = 0;
+    if (ret = writer.Initialize()) {
+        printf("writer initialize failed, errmsg: %s\n", strerror(ret));
+        return -1;
+    }
+
+    char buf[1024];
+    for (int i=0; i<100; i++) {
+        snprintf(buf, 1024, "this is just a test for ShiftWriter, line number %d\n", i);
+        writer.Write(buf, strlen(buf));
+    }
+    return 0;
+}
+
+#endif

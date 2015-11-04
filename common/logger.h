@@ -41,7 +41,7 @@ private:
     static int _max_file_num;
     static int _cur_file_index;
     static int _cur_file_size;
-    const char _file[256];
+//    const char _file[256];
 };
 
 } /* namespace ef */
