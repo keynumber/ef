@@ -15,13 +15,10 @@
 
 namespace ef {
 
-ShiftWriter::ShiftWriter(const char* path, uint32_t max_file_size,
-        uint32_t max_file_number, const char *suffix)
+ShiftWriter::ShiftWriter()
     : _fd(-1)
-    , _path(path)
-    , _suffix(suffix)
-    , _max_file_size(max_file_size)
-    , _max_file_num(max_file_number)
+    , _max_file_size(0)
+    , _max_file_num(0)
     , _cur_file_size(0)
 {
 }
@@ -34,8 +31,17 @@ ShiftWriter::~ShiftWriter()
     }
 }
 
-int ShiftWriter::Initialize()
+int ShiftWriter::Initialize(const char * path,
+                            uint32_t max_file_size,
+                            uint32_t max_file_number,
+                            const char *suffix)
 {
+    _path = path;
+    _max_file_num = max_file_number;
+    _max_file_size = max_file_size;
+    _suffix = suffix;
+
+    // to test whether the path is valid
     char file[256];
     snprintf(file, 256, "%s%d%s", _path.c_str(), 0, _suffix.c_str());
     _fd = open(file,
@@ -44,6 +50,7 @@ int ShiftWriter::Initialize()
     if (_fd < 0) {
         return errno;
     }
+
     return 0;
 }
 
@@ -104,10 +111,9 @@ void ShiftWriter::Shift()
 
 int main(int argc, char *argv[])
 {
-    // ef::ShiftWriter writer("/home/test_shift_write", 500, 5);
-    ef::ShiftWriter writer("/home/number/test_shift_write", 500, 5);
+    ef::ShiftWriter writer;
     int ret = 0;
-    if (ret = writer.Initialize()) {
+    if (ret = writer.Initialize("/home/number/test_shift_write", 500, 5, ".log")) {
         printf("writer initialize failed, errmsg: %s\n", strerror(ret));
         return -1;
     }

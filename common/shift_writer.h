@@ -12,22 +12,16 @@
 
 namespace ef {
 
-static const uint32_t kBuffLen = 128;
-static const uint32_t kDefaultMaxFileSize = 20 * 1024 * 1024;
-static const uint32_t kDefaultMaxFileNumber = 10;
-static const char * kDefaultSuffix = ".log";
-
 /** * 支持按照文件大小对文件及进行切分,
  */
 class ShiftWriter {
 public:
-    ShiftWriter(const char * path,
-                uint32_t max_file_size = kDefaultMaxFileSize,
-                uint32_t max_file_number = kDefaultMaxFileNumber,
-                const char *suffix = kDefaultSuffix);
+    ShiftWriter();
     virtual ~ShiftWriter();
 
-    int Initialize();
+    int Initialize(const char * path, uint32_t max_file_size,
+                   uint32_t max_file_number, const char *suffix);
+
     int Write(void * buf, uint32_t len);
 
 private:
