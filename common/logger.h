@@ -43,6 +43,9 @@ private:
     int _line;
 };
 
+
+#define LOG ef::Logger(__FILE__, __LINE__)
+
 } /* namespace ef */
 
 #endif /* __COMMON_LOGGER_H__ */

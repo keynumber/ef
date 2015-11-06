@@ -16,11 +16,11 @@ int main(void) {
 
     ef::Logger::Initialize("/home/number/test_logger", 1000, 5, ef::kLevelInfo);
     for (int i = 0; i < 100; ++i) {
-        ef::Logger(__FILE__, __LINE__).Info("this is a warn message: %d\n", i);
-        ef::Logger(__FILE__, __LINE__).Debug("this is a debug message: %d\n", i);
+        LOG.Info("this is a warn message: %d\n", i);
+        LOG.Debug("this is a debug message: %d\n", i);
     }
-    ef::Logger(__FILE__, __LINE__).Err("this is a debug message: %13241235d\n");
-    ef::Logger(__FILE__, __LINE__).Err("this is a debug message: %d\n");
+    LOG.Err("this is a debug message: %13241235d\n");
+    LOG.Err("this is a debug message: %d\n");
     // printf core 问题
     return 0;
 }
