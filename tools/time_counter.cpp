@@ -35,14 +35,32 @@ TimeCounter::~TimeCounter()
 #include <mutex>
 #include <atomic>
 #include <thread>
+#include <random>
+
+void TestNewAndDeleteRandom()
+{
+    int n = 10000000;
+    int * arr = new int[n];
+    std::random_device rd;
+    for (int i = 0; i < n; ++i) {
+        arr[i] = rd() % 100000;
+    }
+
+    puts("1000,0000 times new and delete, new size random % 100000");
+    ef::TimeCounter counter;
+    for (int i=0; i<n; i++) {
+        char * t = new char[arr[i]];
+        delete []t;
+    }
+}
 
 void TestNewAndDelete()
 {
-    puts("1000,0000 times new and delete, new size 1000");
     int n = 10000000;
+    puts("1000,0000 times new and delete, new size 1000");
     ef::TimeCounter counter;
     for (int i=0; i<n; i++) {
-        char * t = new char[100];
+        char * t = new char[1000];
         delete []t;
     }
 }
@@ -107,6 +125,7 @@ int main(int argc, char *argv[])
     TestStdMutex();
     TestGetTimeofday();
     TestNewAndDelete();
+    TestNewAndDeleteRandom();
     TestAtomicInt();
     TestEmptyObject();
     TestTime();
