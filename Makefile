@@ -7,7 +7,10 @@ OBJS = easyframe.o 				\
 	   common/mem_pool.o 		\
 	   common/poller.o			\
 	   common/logger.o			\
-	   common/shift_writer.o
+	   common/shift_writer.o	\
+	   common/io_wrapper.o		\
+	   common/event_notifier.o	\
+	   common/task_pool.o
 
 LIBS =
 

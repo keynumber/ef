@@ -6,12 +6,13 @@
 #include "shift_writer.h"
 
 #include <stdio.h>
-#include <errno.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/fcntl.h>
 #include <unistd.h>
+
+#include "io_wrapper.h"
 
 namespace ef {
 
@@ -26,7 +27,7 @@ ShiftWriter::ShiftWriter()
 ShiftWriter::~ShiftWriter()
 {
     if (_fd >= 0) {
-        close(_fd);
+        safe_close(_fd);
         _fd = -1;
     }
 }
@@ -71,10 +72,7 @@ int ShiftWriter::Write(void* buf, uint32_t len)
         }
     }
 
-    int ret = 0;
-    do {
-        ret = write(_fd, buf, len);
-    } while (ret < 0 && errno == EINTR);
+    int ret = safe_write(_fd, buf, len);
 
     _cur_file_size += len;
 
@@ -84,7 +82,7 @@ int ShiftWriter::Write(void* buf, uint32_t len)
 void ShiftWriter::Shift()
 {
     if (_fd >= 0) {
-        close(_fd);
+        safe_close(_fd);
         _fd = -1;
     }
 
