@@ -25,8 +25,8 @@ public:
     Logger(const char *file, int line);
     virtual ~Logger();
 
-    static int Initialize(const char * path, const int max_file_size,
-                          const int max_file_num, const LogLevel filter);
+    static int Initialize(const char * path, const uint32_t max_file_size,
+                          const uint32_t max_file_num, const LogLevel filter);
     static void SetLogFilter(LogLevel filter);
     void Fatal(const char * format, ...) __attribute__ ((format (printf, 2, 3)));
     void Err  (const char * format, ...) __attribute__ ((format (printf, 2, 3)));

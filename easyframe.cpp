@@ -12,7 +12,7 @@
 
 int main(void) {
     ef::Poller poller;
-    ef::MemPool mem_pool(128, 1280, 128);
+    ef::MemPool mem_pool;
 
     ef::Logger::Initialize("/home/number/test_logger", 1000, 5, ef::kLevelInfo);
     for (int i = 0; i < 100; ++i) {

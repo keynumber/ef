@@ -29,11 +29,11 @@ Logger::~Logger()
 {
 }
 
-int Logger::Initialize(const char* path, const int max_file_size,
-                       const int max_file_num, const LogLevel filter)
+int Logger::Initialize(const char* path, const uint32_t max_file_size,
+                       const uint32_t max_file_num, const LogLevel filter)
 {
     int ret = 0;
-    if (ret = _writer.Initialize(path, max_file_size, max_file_num, ".log")) {
+    if ((ret = _writer.Initialize(path, max_file_size, max_file_num, ".log"))) {
         return ret;
     }
     _log_filter = filter;
@@ -59,7 +59,7 @@ void Logger::Log(const LogLevel level, const char* format, va_list va)
     gettimeofday(&now, nullptr);
     struct tm tm;
     localtime_r(&now.tv_sec, &tm);
-    int write_size = snprintf(ptr, kBufSize-(ptr-buf), "%02d-%02d %02d:%02d:%02d.%06ld",
+    int write_size = snprintf(ptr, static_cast<size_t>(kBufSize-(ptr-buf)), "%02d-%02d %02d:%02d:%02d.%06ld",
             tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec,
             static_cast<long>(now.tv_usec));
     ptr += write_size;
@@ -76,7 +76,7 @@ void Logger::Log(const LogLevel level, const char* format, va_list va)
         default         : memcpy(ptr, "OTHER ", 6); ptr += 6; break;
     }
 
-    write_size = snprintf(ptr, kBufSize-(ptr-buf), "[%s:%d] ", _file, _line);
+    write_size = snprintf(ptr, static_cast<size_t>(kBufSize-(ptr-buf)), "[%s:%d] ", _file, _line);
     if (write_size > kMaxPathLength) {
         write_size = kMaxPathLength;
     }
