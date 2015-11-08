@@ -19,7 +19,6 @@ namespace ef {
  * 因此,判空条件为: _head = (_head + 1) % _max_size;
  *        满条件为:(_tail + 1) % _max_size == _head;
  * 因此需要两个额外的对象,因为,当队列总长度为2时,队列始终为空,也始终为满
- *
  */
 template<class T>
 class FixQueue {
