@@ -16,6 +16,9 @@ namespace ef {
  *
  * Note: 因为获取事件时,返回-1表示失败,因此返回int64_t,
  *       所以支持的最大的事件个数为LLONG_MAX
+ *
+ *
+ * notice: EventNotifier 是线程安全的
  */
 class EventNotifier {
 public:

@@ -31,4 +31,5 @@ $(TARGET):	$(OBJS)
 all:	$(TARGET)
 
 clean:
+	@ echo cleaning...
 	@ rm -f $(OBJS) $(TARGET)
