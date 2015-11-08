@@ -9,6 +9,7 @@
 #include <sys/eventfd.h>
 
 #include "io_wrapper.h"
+#include "macro.h"
 
 namespace ef {
 
@@ -51,7 +52,7 @@ int64_t EventNotifier::GetEvent()
 {
     uint64_t num;
     ssize_t ret = safe_read(_fd, &num, sizeof(uint64_t));
-    if (ret == sizeof(uint64_t))
+    if (likely(ret == sizeof(uint64_t)))
         return static_cast<int64_t>(num);
     return -1;
 }
