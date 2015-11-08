@@ -36,7 +36,7 @@ public:
      * @desc 通知事件,通知后,可以通过GetOneEvent/GetAllEvent获取事件个数
      * @param [in] num 通知事件的个数
      */
-    bool Notify(uint64_t num = 1);
+    bool Notify(uint64_t num);
 
     /**
      * @desc 获取事件的个数,当为边水平触发时
