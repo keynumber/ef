@@ -3,4 +3,5 @@ printf core问题怎么避免
 poller test
 mem_pool
 event_notifier 是否线程安全
+fixqueue拷贝构造函数
 

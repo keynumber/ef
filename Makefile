@@ -17,13 +17,18 @@ LIBS =
 TARGET = easyframe
 
 $(TARGET):	$(OBJS)
-	$(CXX) $(CXXFLAGS) -o $(TARGET) $(OBJS) $(LIBS)
+	@ echo LD $(TARGET)
+	@ $(CXX) $(CXXFLAGS) -o $(TARGET) $(OBJS) $(LIBS)
 
 %.o: %.cpp
-	$(CXX) $(CXXFLAGS) -c -o $@ $<
+	@ echo 'CXX $@'
+	@ $(CXX) $(CXXFLAGS) -c -o $@ $<
 
+%.o: %.c
+	@ echo 'CC $@'
+	@ $(CXX) $(CXXFLAGS) -c -o $@ $<
 
 all:	$(TARGET)
 
 clean:
-	rm -f $(OBJS) $(TARGET)
+	@ rm -f $(OBJS) $(TARGET)
