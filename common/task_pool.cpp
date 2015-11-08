@@ -13,7 +13,6 @@ namespace ef {
 
 TaskPool::TaskPool(uint32_t size)
     : _queue(size)
-    , _notifier(nullptr)
 {
     _notifier = new EventNotifier();
     assert(_notifier != nullptr);
@@ -35,20 +34,28 @@ bool TaskPool::Put(void* task)
     bool ret = _queue.push(task);
     _lock.unlock();
 
+    if (ret) {
+        _notifier->Notify(1);
+    }
     return ret;
 }
 
-bool TaskPool::Get(void** task)
+int TaskPool::Take(void** task)
 {
-    bool ret = true;
+    int ret = 0;
     _lock.lock();
     if (_queue.empty()) {
-        ret = false;
+        *task = nullptr;
+    } else {
+        *task = _queue.front();
+        _queue.pop();
     }
-    *task = _queue.front();
-    _queue.pop();
     _lock.unlock();
-    return ret;
+
+    if (*task) {
+        ret = _notifier->GetEvent();
+    }
+    return ret - 1;
 }
 
 int TaskPool::GetNotifier() const
