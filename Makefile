@@ -3,6 +3,9 @@ WARNING_FALGS = -Wreturn-type -Wunused-value -Wunused-parameter -Wsign-conversio
 CXXFLAGS = -std=c++11 -pthread -O2 -g -Wall -fmessage-length=0
 CXXFLAGS += $(WARNING_FALGS)
 
+
+INC = -I.
+
 OBJS = easyframe.o 				\
 	   common/mem_pool.o 		\
 	   common/poller.o			\
@@ -18,15 +21,15 @@ TARGET = easyframe
 
 $(TARGET):	$(OBJS)
 	@ echo LD $(TARGET)
-	@ $(CXX) $(CXXFLAGS) -o $(TARGET) $(OBJS) $(LIBS)
+	@ $(CXX) $(INC) $(CXXFLAGS) -o $(TARGET) $(OBJS) $(LIBS)
 
 %.o: %.cpp
 	@ echo 'CXX $@'
-	@ $(CXX) $(CXXFLAGS) -c -o $@ $<
+	@ $(CXX) $(INC) $(CXXFLAGS) -c -o $@ $<
 
 %.o: %.c
 	@ echo 'CC $@'
-	@ $(CXX) $(CXXFLAGS) -c -o $@ $<
+	@ $(CXX) $(INC) $(CXXFLAGS) -c -o $@ $<
 
 all:	$(TARGET)
 
