@@ -8,7 +8,9 @@
 
 #include <cstring>
 
-void Split(const std::string &str, const std::string &delim, std::vector<std::string> *vec)
+const char *kDelimiter = " \t\r\n\f\v\b\a";
+
+void split(const std::string &str, const std::string &delim, std::vector<std::string> *vec)
 {
     std::string::size_type str_len = str.length();
     std::string::size_type delim_len = delim.length();
@@ -22,15 +24,35 @@ void Split(const std::string &str, const std::string &delim, std::vector<std::st
             continue;
         }
 
-        vec->push_back(str.substr(start, pos-start));
-        start = pos;
         if (pos == std::string::npos) {
+            vec->push_back(str.substr(start));
             break;
+        } else {
+            vec->push_back(str.substr(start, pos-start));
         }
+
+        start = pos;
     }
 }
 
-bool StartWith(const std::string &str, const std::string &prefix)
+void splitany(const std::string &str, const std::string &charset, std::vector<std::string> *vec)
+{
+    std::string::size_type start = str.find_first_not_of(charset);
+    std::string::size_type pos = start;
+
+    while (start != std::string::npos) {
+        pos = str.find_first_of(charset, start);
+
+        if (pos == std::string::npos) {
+            vec->push_back(str.substr(start));
+            break;
+        }
+        vec->push_back(str.substr(start, pos-start));
+        start = str.find_first_not_of(charset, pos);
+    }
+}
+
+bool startwith(const std::string &str, const std::string &prefix)
 {
     std::string::size_type str_len = str.length();
     std::string::size_type pre_len = prefix.length();
@@ -39,7 +61,7 @@ bool StartWith(const std::string &str, const std::string &prefix)
     return 0 == str.compare(0, pre_len, prefix);
 }
 
-bool EndWith(const std::string &str, const std::string &prefix)
+bool endwith(const std::string &str, const std::string &prefix)
 {
     std::string::size_type str_len = str.length();
     std::string::size_type pre_len = prefix.length();
@@ -48,6 +70,33 @@ bool EndWith(const std::string &str, const std::string &prefix)
     return 0 == str.compare(str_len - pre_len, prefix.length(), prefix);
 }
 
+std::string trim(const std::string &str) {
+    std::string::size_type strhead = str.find_first_not_of(kDelimiter);
+    if (strhead == std::string::npos) {
+        return std::string();
+    }
+
+    std::string::size_type strtail = str.find_last_not_of(kDelimiter);
+    return str.substr(strhead, strtail - strhead + 1);
+}
+
+std::string ltrim(const std::string &str) {
+    std::string::size_type strhead = str.find_first_not_of(kDelimiter);
+    if (strhead == std::string::npos) {
+        return std::string();
+    } else {
+        return str.substr(strhead);
+    }
+}
+
+std::string rtrim(const std::string &str) {
+    std::string::size_type strtail = str.find_last_not_of(kDelimiter);
+    if (strtail == std::string::npos) {
+        return std::string();
+    } else {
+        return str.substr(0, strtail + 1);
+    }
+}
 
 #if 1
 
@@ -56,10 +105,11 @@ bool EndWith(const std::string &str, const std::string &prefix)
 #include <iostream>
 using namespace std;
 
-void TestSplit(const char *str, const std::string &delim)
+void testsplit(const char *str, const std::string &delim)
 {
+    cout << str << " testsplit with " << delim << endl;
     std::vector<std::string> vec;
-    Split(str, delim, &vec);
+    split(str, delim, &vec);
     cout << vec.size() << "\t";
     for (const auto & it : vec) {
         cout << it << "\t";
@@ -67,31 +117,53 @@ void TestSplit(const char *str, const std::string &delim)
     cout << endl;
 }
 
-void TestStartWithAndEndWith(const std::string &str, const std::string &prefix) {
+void testsplitany(const char *str, const std::string &charset)
+{
+    cout << str << " testsplitany with " << charset << endl;
+    std::vector<std::string> vec;
+    splitany(str, charset, &vec);
+    cout << vec.size() << "\t";
+    for (const auto & it : vec) {
+        cout << it << "\t";
+    }
+    cout << endl;
+}
+
+void teststartwithandendwith(const std::string &str, const std::string &prefix) {
     printf("%s star with %s \n", str.c_str(), prefix.c_str());
-    printf("%d\n", StartWith(str, prefix));
+    printf("%d\n", startwith(str, prefix));
     printf("%s end with %s \n", str.c_str(), prefix.c_str());
-    printf("%d\n", EndWith(str, prefix));
+    printf("%d\n", endwith(str, prefix));
 }
 
 int main(int argc, char *argv[])
 {
-    puts("test split");
-    TestSplit( "asdf", "asdf");
-    TestSplit( "asdfasdf", "asdf");
-    TestSplit( "hello world", " ");
-    TestSplit( "hello       world", " ");
-    TestSplit( "helloasdfasdfworldadsaf", "asdf");
-    TestSplit( "asdfasdfhelloasdfasdfworldadsafasdftest", "asdf");
-    TestSplit( "asdasdfhelloasdfasdfworldadsafasdftest", "asdf");
+    puts(" ---- test split --------");
+    testsplit( "asdf", "asdf");
+    testsplit( "asdfasdf", "asdf");
+    testsplit( "hello world", " ");
+    testsplit( "hello       world", " ");
+    testsplit( "helloasdfasdfworldadsaf", "asdf");
+    testsplit( "asdfasdfhelloasdfasdfworldadsafasdftest", "asdf");
+    testsplit( "asdasdfhelloasdfasdfworldadsafasdftest", "asdf");
 
-    puts("\ntest start with and end with");
-    TestStartWithAndEndWith("help", "help");
-    TestStartWithAndEndWith("help", "helpa");
-    TestStartWithAndEndWith("helpa", "help");
-    TestStartWithAndEndWith("helpa", "help");
-    TestStartWithAndEndWith("helpa", "elp");
-    TestStartWithAndEndWith("help", "elp");
+    puts("\n ---- test splitany --------");
+    testsplitany("asdfasdffdadf", "ekpo");
+    testsplitany("asdfasdffdadf", "asdf");
+    testsplitany("asdfasdffdadf", "as");
+    testsplitany("asdfassssaasasa", "as");
+    testsplitany("asassssaasasafd", "as");
+    testsplitany("asasssdfsaasasa", "as");
+    testsplitany("asdfssdfsaassfd", "as");
+    testsplitany("dfssdasdsaassfd", "as");
+
+    puts("\n ---------- test start with and end with --------");
+    teststartwithandendwith("help", "help");
+    teststartwithandendwith("help", "helpa");
+    teststartwithandendwith("helpa", "help");
+    teststartwithandendwith("helpa", "help");
+    teststartwithandendwith("helpa", "elp");
+    teststartwithandendwith("help", "elp");
 
     return 0;
 }

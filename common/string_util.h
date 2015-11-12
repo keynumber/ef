@@ -10,9 +10,13 @@
 #include <string>
 #include <vector>
 
-void Split(const std::string &str, const std::string &delim, std::vector<std::string> *vec);
-bool StartWith(const std::string &str, const std::string &prefix);
-bool EndWith(const std::string &str, const std::string &prefix);
+void split(const std::string &str, const std::string &delim, std::vector<std::string> *vec);
+void splitany(const std::string &str, const std::string &charset, std::vector<std::string> *vec);
+bool startwith(const std::string &str, const std::string &prefix);
+bool endwith(const std::string &str, const std::string &prefix);
 
+std::string trim(const std::string &str);
+std::string ltrim(const std::string &str);
+std::string rtrim(const std::string &str);
 
 #endif /* __COMMON_STRING_UTIL_H__ */
