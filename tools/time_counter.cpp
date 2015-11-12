@@ -36,6 +36,7 @@ TimeCounter::~TimeCounter()
 #include <atomic>
 #include <thread>
 #include <random>
+#include <unordered_set>
 
 void TestNewAndDeleteRandom()
 {
@@ -52,6 +53,7 @@ void TestNewAndDeleteRandom()
         char * t = new char[arr[i]];
         delete []t;
     }
+    delete [] arr;
 }
 
 void TestNewAndDelete()
@@ -120,6 +122,37 @@ void TestEmptyObject()
         A a;
     }
 }
+
+void TestUnorderedSet()
+{
+    int n = 10000000;
+    int * arr = new int[n];
+    std::random_device rd;
+    for (int i = 0; i < n; ++i) {
+        arr[i] = rd() % 100000;
+    }
+
+    std::unordered_set<int> set;
+
+    {
+        puts("1000,0000 times unordered_set insert, new size random % 100000");
+        ef::TimeCounter counter;
+        for (int i=0; i<n; i++) {
+            set.insert(arr[i]);
+        }
+    }
+
+    {
+        puts("1000,0000 times unordered_set find, new size random % 100000");
+        ef::TimeCounter counter;
+        for (int i=0; i<n; i++) {
+            set.find(arr[i]);
+        }
+    }
+
+    delete [] arr;
+}
+
 int main(int argc, char *argv[])
 {
     TestStdMutex();
@@ -129,6 +162,7 @@ int main(int argc, char *argv[])
     TestAtomicInt();
     TestEmptyObject();
     TestTime();
+    TestUnorderedSet();
     return 0;
 }
 
