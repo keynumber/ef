@@ -29,10 +29,10 @@ typedef std::unordered_map<std::string, Value> CMapContent;
 extern const Value kNullValue;
 
 struct Value {
-    Value () : type(kValueNull), value(nullptr) {};
-    Value (CMapItemType t) : type(t), value(nullptr) {};
+    Value () : value(nullptr), type(kValueNull) {};
+    Value (CMapItemType t) : value(nullptr), type(t) {};
     Value(const Value &val) { Copy(val); }
-    Value & operator=(const Value &val) { Copy(val); }
+    Value & operator=(const Value &val) { Copy(val); return *this;}
 
     virtual ~Value ()
     {
@@ -104,7 +104,7 @@ struct Value {
         return it->second;
     }
 
-    const Value & operator[] (int index) const
+    const Value & operator[] (uint32_t index) const
     {
         if (type != kValueArray) {
             return kNullValue;

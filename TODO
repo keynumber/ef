@@ -1,7 +1,12 @@
 logger 多线程
-printf core问题怎么避免
 poller test
-mem_pool
-event_notifier 是否线程安全
+mem_pool完善
 fixqueue拷贝构造函数
 timerfd测试
+2. printf core问题怎么避免?貌似只能注意了,或者使用stringstream,将格式干掉,stringstream待添加
+c_map通过=分割,key和value不能包含空格/tab/换行等,后边需要改造,应该支持"
+
+
+
+# done
+1. event_notifier 是否线程安全? Yes

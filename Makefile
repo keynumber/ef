@@ -13,6 +13,8 @@ OBJS = easyframe.o 				\
 	   common/shift_writer.o	\
 	   common/io_wrapper.o		\
 	   common/event_notifier.o	\
+	   common/string_util.o		\
+	   common/c_map.o			\
 	   common/task_pool.o
 
 LIBS =

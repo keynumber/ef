@@ -275,7 +275,7 @@ const std::string & CMap::GetErrMsg() const
 
 } /* namespace ef */
 
-#if 1
+#if 0
 
 #include <iostream>
 using namespace std;
