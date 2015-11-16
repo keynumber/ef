@@ -5,7 +5,6 @@
 
 #include "c_map.h"
 
-#include <cassert>
 #include <cstdio>
 #include <fstream>
 
@@ -121,7 +120,8 @@ bool CMap::HandleContent(const std::string &str, int line,
         }
         else
         {
-            assert(false);
+            _errmsg = "format error at line " + std::to_string(line) + ": " + str;
+            return false;
         }
 
         break;
@@ -159,7 +159,8 @@ bool CMap::HandleContent(const std::string &str, int line,
         }
         else
         {
-            assert(false);
+            _errmsg = "format error at line " + std::to_string(line) + ": " + str;
+            return false;
         }
 
         tst->push(kValueObject);
@@ -191,7 +192,8 @@ bool CMap::HandleContent(const std::string &str, int line,
             val.value = static_cast<void*>(new Array);
             p = val.value;
         } else {
-            assert(false);
+            _errmsg = "format error at line " + std::to_string(line) + ": " + str;
+            return false;
         }
 
         tst->push(kValueArray);
@@ -208,7 +210,8 @@ bool CMap::HandleContent(const std::string &str, int line,
 
     default:
     {
-        assert(false);
+        _errmsg = "format error at line " + std::to_string(line) + ": " + str;
+        return false;
         break;
     }
 
