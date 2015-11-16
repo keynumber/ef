@@ -78,6 +78,11 @@ bool CMap::HandleContent(const std::string &str, int line,
         return false;
     }
 
+    if (tst->size() != pst->size() || tst->empty()) {
+        _errmsg = "fatal error, analyise stack is broken";
+        return false;
+    }
+
     CMapItemType type = tst->top();
     void * cur_content = pst->top();
 
@@ -170,6 +175,11 @@ bool CMap::HandleContent(const std::string &str, int line,
 
     case '}':
     {
+        if (type != kValueObject) {
+            _errmsg = "format error at line " + std::to_string(line) + ": " + str;
+            return false;
+        }
+
         pst->pop();
         tst->pop();
         break;
@@ -203,6 +213,11 @@ bool CMap::HandleContent(const std::string &str, int line,
 
     case ']':
     {
+        if (type != kValueArray) {
+            _errmsg = "format error at line " + std::to_string(line) + ": " + str;
+            return false;
+        }
+
         pst->pop();
         tst->pop();
         break;
