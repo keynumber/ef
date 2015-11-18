@@ -6,7 +6,7 @@ CXXFLAGS += $(WARNING_FALGS)
 
 INC = -I.
 
-OBJS = easyframe.o 				\
+OBJS = ef.o 					\
 	   common/mem_pool.o 		\
 	   common/poller.o			\
 	   common/logger.o			\
@@ -15,11 +15,12 @@ OBJS = easyframe.o 				\
 	   common/event_notifier.o	\
 	   common/string_util.o		\
 	   common/c_map.o			\
+	   common/socket_buffer.o	\
 	   common/task_pool.o
 
 LIBS =
 
-TARGET = easyframe
+TARGET = ef
 
 $(TARGET):	$(OBJS)
 	@ echo LD $(TARGET)
