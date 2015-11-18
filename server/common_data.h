@@ -36,14 +36,13 @@ enum PollerFdType{
  *       否则,保存上次路由的worker的ID,用于数据均衡分发
  */
 struct FdInfo {
-    int        fd;
-    uint32_t   fd_type;           //   PollerFdType
-    uint32_t   extern_ip;
-    uint16_t   extern_port;
-    uint16_t   local_port;
-    void       *ext;
-
-    time_t     last_active_time;
+    int        fd               = -1;
+    uint32_t   fd_type          = -1;           //   PollerFdType
+    uint32_t   extern_ip        = -1;
+    uint16_t   extern_port      = -1;
+    uint16_t   local_port       = -1;
+    void       *ext             = nullptr;
+    time_t     last_active_time = 0;
 };
 
 

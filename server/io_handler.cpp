@@ -9,13 +9,22 @@ namespace ef {
 
 IoHandler::IoHandler()
 {
-    // TODO Auto-generated constructor stub
-
 }
 
 IoHandler::~IoHandler()
 {
-    // TODO Auto-generated destructor stub
+}
+
+bool IoHandler::Initialize()
+{
+    // 创建监听文件描述符
+    // 初始化日志
+    // 初始化统计
+    // 初始化epoll
+    // 添加监听文件描述符到epoll
+    // epoll_wait
+
+    return true;
 }
 
 } /* namespace ef */
