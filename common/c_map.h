@@ -85,6 +85,13 @@ struct Value {
         return *static_cast<std::string*>(value);
     }
 
+    const char * c_str() const {
+        if (type != kValueString) {
+            return "";
+        }
+        return static_cast<std::string*>(value)->c_str();
+    }
+
     const Value & operator[] (const std::string key) const
     {
         if (type != kValueObject) {
