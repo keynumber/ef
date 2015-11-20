@@ -41,8 +41,8 @@ char * safe_strerror(int errorno, char *buf, size_t buflen) {
 #else
     const char * error = strerror_r(errorno, buf, buflen);
     if (error != buf) {
-        int to_copy = strlen(error) + 1;
-        int copy_len = to_copy > buflen ? buflen : to_copy;
+        size_t to_copy = strlen(error) + 1;
+        size_t copy_len = to_copy > buflen ? buflen : to_copy;
         memcpy(buf, error, copy_len);
         buf[buflen-1] = 0;
     }
