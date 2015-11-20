@@ -4,7 +4,7 @@
 
 #include <unistd.h>
 
-#include <string>
+#include <string.h>
 
 #include "macro.h"
 
@@ -35,15 +35,19 @@ int safe_close(int fd)
     return ret;
 }
 
-std::string safe_strerror(int errorno)
-{
-    const int buf_len = 256;
-    char buf[buf_len];
+char * safe_strerror(int errorno, char *buf, size_t buflen) {
 #if (_POSIX_C_SOURCE >= 200112L || _XOPEN_SOURCE >= 600) && ! _GNU_SOURCE
-    strerror_r(errorno, buf, buf_len);
-    return std::string(buf);
+    strerror_r(errorno, buf, buflen);
 #else
-    const char * error = strerror_r(errorno, buf, buf_len);
-    return std::string(error);
+    const char * error = strerror_r(errorno, buf, buflen);
+    if (error != buf) {
+        int to_copy = strlen(error) + 1;
+        int copy_len = to_copy > buflen ? buflen : to_copy;
+        memcpy(buf, error, copy_len);
+        buf[buflen-1] = 0;
+    }
 #endif
+    return buf;
 }
+
+
