@@ -102,7 +102,7 @@ std::string rtrim(const std::string &str) {
 
 } /* namespace ef */
 
-#if 1
+#if 0
 
 #include <stdio.h>
 
