@@ -54,6 +54,20 @@ struct Value {
         value  = nullptr;
     }
 
+    uint32_t size() const {
+        if (type  == kValueString) {
+            std::string *str = static_cast<std::string*>(value);
+            return static_cast<uint32_t>(str->size());
+        } else if (type == kValueArray) {
+            Array *arr = static_cast<Array*>(value);
+            return static_cast<uint32_t>(arr->size());
+        } else if (type == kValueObject) {
+            Object *obj = static_cast<Object*>(value);
+            return static_cast<uint32_t>(obj->size());
+        }
+        return 0;
+    }
+
     void Copy(const Value& val) {
         // 如果有数据,先删除
         if (value) {
