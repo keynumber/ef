@@ -76,22 +76,25 @@ unsigned long long convert(const char * const str, char **endptr, int base)
 
 // float
 template <>
-float convert(const char * const str, char **endptr)
+float convert(const char * const str, char **endptr, int base)
 {
+    base = base;            // just to escape warning
     return static_cast<float>(strtof(str, endptr));
 }
 
 // double
 template <>
-double convert(const char * const str, char **endptr)
+double convert(const char * const str, char **endptr, int base)
 {
+    base = base;            // just to escape warning
     return static_cast<double>(strtod(str, endptr));
 }
 
 // long double
 template <>
-long double convert(const char * const str, char **endptr)
+long double convert(const char * const str, char **endptr, int base)
 {
+    base = base;            // just to escape warning
     return static_cast<long double>(strtold(str, endptr));
 }
 
@@ -162,22 +165,25 @@ unsigned long long convert(const std::string & str, char **endptr, int base)
 
 // float
 template <>
-float convert(const std::string & str, char **endptr)
+float convert(const std::string & str, char **endptr, int base)
 {
+    base = base;            // just to escape warning
     return static_cast<float>(strtof(str.c_str(), endptr));
 }
 
 // double
 template <>
-double convert(const std::string & str, char **endptr)
+double convert(const std::string & str, char **endptr, int base)
 {
+    base = base;            // just to escape warning
     return static_cast<double>(strtod(str.c_str(), endptr));
 }
 
 // long double
 template <>
-long double convert(const std::string & str, char **endptr)
+long double convert(const std::string & str, char **endptr, int base)
 {
+    base = base;            // just to escape warning
     return static_cast<long double>(strtold(str.c_str(), endptr));
 }
 
