@@ -11,6 +11,8 @@
 #include <vector>
 #include <unordered_map>
 
+#include "string_number.h"
+
 namespace ef {
 
 enum CMapItemType {
@@ -137,6 +139,16 @@ struct Value {
         }
 
         return (*arr)[index];
+    }
+
+    template <class T>
+    T as(T default_Val) const
+    {
+        if (type != kValueString || kValueNull == type) {
+            return default_Val;
+        }
+
+        return convert<T>(*static_cast<std::string*>(value));
     }
 
     void *value;
