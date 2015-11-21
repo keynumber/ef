@@ -8,6 +8,8 @@
 
 #include <cstring>
 
+namespace ef {
+
 const char *kDelimiter = " \t\r\n\f\v\b\a";
 
 void split(const std::string &str, const std::string &delim, std::vector<std::string> *vec)
@@ -98,12 +100,15 @@ std::string rtrim(const std::string &str) {
     }
 }
 
-#if 0
+} /* namespace ef */
+
+#if 1
 
 #include <stdio.h>
 
 #include <iostream>
 using namespace std;
+using namespace ef;
 
 void testsplit(const char *str, const std::string &delim)
 {
