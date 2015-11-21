@@ -32,7 +32,7 @@ ShiftWriter::~ShiftWriter()
     }
 }
 
-int ShiftWriter::Initialize(const char * path,
+bool ShiftWriter::Initialize(const char * path,
                             uint32_t max_file_size,
                             uint32_t max_file_number,
                             const char *suffix)
@@ -49,10 +49,14 @@ int ShiftWriter::Initialize(const char * path,
             O_CREAT | O_APPEND | O_WRONLY | O_NOFOLLOW | O_NOCTTY,
             S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
     if (_fd < 0) {
-        return errno;
+        int errorno = errno;
+        char buf[256];
+        safe_strerror(errorno, buf, 256);
+        _errmsg = buf;
+        return false;
     }
 
-    return 0;
+    return true;
 }
 
 int ShiftWriter::Write(void* buf, uint32_t len)
@@ -68,7 +72,11 @@ int ShiftWriter::Write(void* buf, uint32_t len)
                 O_CREAT | O_APPEND | O_WRONLY | O_NOFOLLOW | O_NOCTTY,
                 S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
         if (_fd < 0) {
-            return errno;
+            int errorno = errno;
+            char buf[256];
+            safe_strerror(errorno, buf, 256);
+            _errmsg = buf;
+            return -1;
         }
     }
 
@@ -101,6 +109,11 @@ void ShiftWriter::Shift()
     _cur_file_size = 0;
 }
 
+const std::string & ShiftWriter::GetErrMsg() const
+{
+    return _errmsg;
+}
+
 } /* namespace ef */
 
 #if 0
@@ -112,7 +125,7 @@ int main(int argc, char *argv[])
     ef::ShiftWriter writer;
     int ret = 0;
     if (ret = writer.Initialize("/home/number/test_shift_write", 500, 5, ".log")) {
-        printf("writer initialize failed, errmsg: %s\n", strerror(ret));
+        printf("writer initialize failed, errmsg: %s\n", writer.GetErrMsg().c_str());
         return -1;
     }
 

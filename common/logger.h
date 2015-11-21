@@ -25,10 +25,12 @@ public:
     Logger(const char *file, int line);
     virtual ~Logger();
 
-    static int Initialize(const char * path, const uint32_t max_file_size,
+    static bool Initialize(const char * path, const uint32_t max_file_size,
                           const uint32_t max_file_num, const LogLevel level);
-    static int Initialize(const char * path, const uint32_t max_file_size,
+    static bool Initialize(const char * path, const uint32_t max_file_size,
                           const uint32_t max_file_num, const char * level);
+    static const std::string & GetErrMsg();
+
     static void SetLogFilter(LogLevel filter);
     void Fatal(const char * format, ...) __attribute__ ((format (printf, 2, 3)));
     void Err  (const char * format, ...) __attribute__ ((format (printf, 2, 3)));

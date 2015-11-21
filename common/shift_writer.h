@@ -19,10 +19,11 @@ public:
     ShiftWriter();
     virtual ~ShiftWriter();
 
-    int Initialize(const char * path, uint32_t max_file_size,
+    bool Initialize(const char * path, uint32_t max_file_size,
                    uint32_t max_file_number, const char *suffix);
 
     int Write(void * buf, uint32_t len);
+    const std::string & GetErrMsg() const;
 
 private:
     void Shift();
@@ -34,6 +35,8 @@ private:
     uint32_t _max_file_size;
     uint32_t _max_file_num;
     uint32_t _cur_file_size;
+
+    std::string _errmsg;
 };
 
 } /* namespace ef */

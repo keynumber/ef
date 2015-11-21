@@ -29,18 +29,19 @@ Logger::~Logger()
 {
 }
 
-int Logger::Initialize(const char* path, const uint32_t max_file_size,
+bool Logger::Initialize(const char* path, const uint32_t max_file_size,
                        const uint32_t max_file_num, const LogLevel level)
 {
-    int ret = 0;
-    if ((ret = _writer.Initialize(path, max_file_size, max_file_num, ".log"))) {
-        return ret;
-    }
     _log_filter = level;
-    return 0;
+    return _writer.Initialize(path, max_file_size, max_file_num, ".log");
 }
 
-int Logger::Initialize(const char * path, const uint32_t max_file_size,
+const std::string & Logger::GetErrMsg()
+{
+    return _writer.GetErrMsg();
+}
+
+bool Logger::Initialize(const char * path, const uint32_t max_file_size,
                const uint32_t max_file_num, const char * str_level)
 {
     LogLevel level = GetLevel(str_level);
@@ -136,7 +137,12 @@ LOGGER_DEF(Debug)
 
 int main(int argc, char *argv[])
 {
-    ef::Logger::Initialize("/home/number/test_logger", 1000, 5, ef::kLevelInfo);
+    if (!ef::Logger::Initialize("/test_logger", 1000, 5, ef::kLevelInfo))
+    {
+        printf("Initialize failed, errmsg: %s\n", ef::Logger::GetErrMsg().c_str());
+        return -1;
+    }
+
     for (int i = 0; i < 100; ++i) {
         LOG.Info("this is a warn message: %d\n", i);
         LOG.Debug("this is a debug message: %d\n", i);
