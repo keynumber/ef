@@ -8,6 +8,7 @@
 
 #include <cstdint>
 #include <list>
+#include <string>
 
 #define DEFAULT_BUFFER_BLOCK_SIZE 1024
 
