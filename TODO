@@ -6,8 +6,9 @@ timerfd测试
 2. printf core问题怎么避免?貌似只能注意了,或者使用stringstream,将格式干掉,stringstream待添加
 c_map通过=分割,key和value不能包含空格/tab/换行等,后边需要改造,应该支持"
 SocketBuffer通过内存池获取内存块,可以优化,因为内存块大小相同,也不需要跨线程,可以在线程内部做为固定块,sendtosocket没有测试
+errno, shiftwriter and safe_io, return number, 见controller
 
-
+number to string
 
 # done
 1. event_notifier 是否线程安全? Yes
