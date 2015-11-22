@@ -21,10 +21,11 @@ public:
     virtual ~SocketBuffer();
 
     uint32_t Size() const;
+    void Clear();
     bool Append(const char *buf, uint32_t len);
     uint32_t Get(char *buf, uint32_t len) const;
     uint32_t Take(char *buf, uint32_t len);
-    int SendToSocket(int sock_fd);
+    int SendToSocket(int sock_fd, std::string * errmsg = nullptr);
 
 private:
     struct Block {

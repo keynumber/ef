@@ -11,6 +11,7 @@
 #include <unistd.h>
 
 #include "mem_pool.h"
+#include "io_wrapper.h"
 
 namespace ef {
 
@@ -27,8 +28,21 @@ SocketBuffer::~SocketBuffer()
     for (auto & it : _buf_list) {
         _mem_pool->Free(it.buf);
         it.buf = nullptr;
+        it.read_index = 0;
         it.write_index = 0;
     }
+}
+
+void SocketBuffer::Clear()
+{
+    for (auto & it : _buf_list) {
+        _mem_pool->Free(it.buf);
+        it.buf = nullptr;
+        it.read_index = 0;
+        it.write_index = 0;
+    }
+
+    _buf_list.clear();
 }
 
 uint32_t SocketBuffer::Size() const
@@ -120,7 +134,7 @@ uint32_t SocketBuffer::Take(char* buf, uint32_t len)
 }
 
 // TODO to test
-int SocketBuffer::SendToSocket(int sock_fd)
+int SocketBuffer::SendToSocket(int sock_fd, std::string *errmsg)
 {
     std::list<Block>::iterator it = _buf_list.begin();
     std::list<Block>::iterator next;
@@ -131,10 +145,15 @@ int SocketBuffer::SendToSocket(int sock_fd)
         ++next;
 
         uint32_t to_send = it->write_index - it->read_index;
-        int isend = write(sock_fd, it->buf, to_send);
+        int isend = safe_write(sock_fd, it->buf, to_send);
         if (isend < 0) {
-            // TODO 来标明不同的socket错误,有些是网络原因导致,如EAGAIN,有些是socket出错
-            return isend;
+            if (errmsg) {
+                int errorno = errno;
+                char buf[256];
+                safe_strerror(errorno, buf, 256);
+                *errmsg = buf;
+            }
+            return -1;
         }
 
         it->read_index += (uint32_t)isend;
