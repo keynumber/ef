@@ -9,6 +9,7 @@
 #include <errno.h>
 
 #include <unistd.h>
+#include <fcntl.h>
 #include <sys/types.h>
 
 #include "macro.h"
@@ -30,6 +31,24 @@ inline ssize_t safe_write(int fd, const void *buf, size_t count)
     do {
         ret = write(fd, buf, count);
     } while (unlikely(ret < 0 && errno == EINTR));
+    return ret;
+}
+
+inline int set_nonblock(int fd)
+{
+    int ret = 0;
+    do {
+        ret = fcntl(fd, F_GETFL);
+    } while (unlikely(ret <0 && errno == EINTR));
+
+    if (ret < 0) {
+        return -1;
+    }
+
+    do {
+        ret = fcntl(fd, F_SETFL, ret | O_NONBLOCK | O_NDELAY);
+    } while (unlikely(ret <0 && errno == EINTR));
+
     return ret;
 }
 
