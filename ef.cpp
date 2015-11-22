@@ -4,15 +4,17 @@
  */
 
 #include <stdio.h>
-#include <stdlib.h>
 
-#include "common/mem_pool.h"
-#include "common/poller.h"
-#include "common/logger.h"
+#include "server/controller.h"
 
-int main(void) {
-    ef::Poller poller;
-    ef::MemPool mem_pool;
+int main(int argc, char *argv[]) {
+    if (argc <= 1) {
+        printf("usage: %s configure_file\n", argv[0]);
+        return -1;
+    }
+
+    ef::Controller controller;
+    controller.Initialize("echosvr", argv[1]);
 
     return 0;
 }

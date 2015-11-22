@@ -11,47 +11,16 @@
 
 namespace ef {
 
-enum PollerFdType{
-    kTcpListenFd    = 0,      // accept连接,并添加到poller继续监听
-    kTcpClientFd    = 1,      // read数据,并路由到worker
-
-    kUdpListenFd    = 2,      // accept连接,并添加到poller继续监听
-    kUdpClientFd    = 3,      // read数据,并路由到worker
-
-    kUnixListenFd   = 4,      // accept连接,并添加到poller继续监听
-    kUnixCLientFd   = 5,      // read数据,并路由数据路由到worker
-
-    kTaskPoolFd     = 6,      // woker处理回包,将接收到的数据发送到对应的client,client对应的fd由TaskData保存
-    kTimerFd        = 7,      // TimerFd,定时任务,执行对应的定时任务
-    kExternServerFd = 8,      // woker访问外部server,iohandler需要将回包送到指定的woker
+struct ListenInfo {
+    int fd;
+    unsigned short port;
 };
-
-
-/**
- * @desc IOHander通过poller进行监听的文件描述符及相关数据
- *
- * @ext 当描述符为socket时,标记
- *       fd_type为kExternSeverFd时使用,用于标记使用的worker的ID
- *       fd_type为kTimerFd时,记录对应的timer执行的回调函数
- *       否则,保存上次路由的worker的ID,用于数据均衡分发
- */
-struct FdInfo {
-    int        fd               = -1;
-    uint32_t   fd_type          = -1;           //   PollerFdType
-    uint32_t   extern_ip        = -1;
-    uint16_t   extern_port      = -1;
-    uint16_t   local_port       = -1;
-    void       *ext             = nullptr;
-    time_t     last_active_time = 0;
-};
-
 
 enum DataType {
     kTcpData     = 0,
     kUdpData     = 1,
     kUnixData    = 2,
 };
-
 
 enum Cmd {
     // io handler to worker
@@ -66,7 +35,6 @@ enum Cmd {
     // control to me
     kControlStop            = 5,
 };
-
 
 /**
  * @desc woker和iohand进行交互的数据,需要确定到唯一的handler及数据相关的文件描述符
