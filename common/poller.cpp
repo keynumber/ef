@@ -8,6 +8,7 @@
 #include <cassert>
 
 #include "macro.h"
+#include "io_wrapper.h"
 
 namespace ef {
 
@@ -25,7 +26,7 @@ Poller::Poller(int max_event_num)
 Poller::~Poller()
 {
     delete []_events;
-    close(_epoll_fd);
+    safe_close(_epoll_fd);
 }
 
 int Poller::Add(int fd, uint64_t key, uint32_t events)

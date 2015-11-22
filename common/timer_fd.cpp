@@ -7,6 +7,8 @@
 
 #include <unistd.h>
 
+#include "io_wrapper.h"
+
 namespace ef {
 
 TimerFd::TimerFd()
@@ -17,7 +19,7 @@ TimerFd::TimerFd()
 TimerFd::~TimerFd()
 {
     if (_timer_fd != -1)
-        close(_timer_fd);
+        safe_close(_timer_fd);
 }
 
 bool TimerFd::Initialize(int flag, int clockId)
