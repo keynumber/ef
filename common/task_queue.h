@@ -3,8 +3,8 @@
  * Date  : Nov 8, 2015
  */
 
-#ifndef __COMMON_TASK_POOL_H_H___
-#define __COMMON_TASK_POOL_H_H___
+#ifndef __COMMON_TASK_QUEUE_H_H___
+#define __COMMON_TASK_QUEUE_H_H___
 
 #include <stdint.h>
 
@@ -19,15 +19,15 @@ class EventNotifier;
 /**
  * @desc 线程安全,固定长度的任务池,采用eventfd进行通知
  */
-class TaskPool {
+class TaskQueue {
 public:
-    TaskPool(uint32_t size);
-    virtual ~TaskPool();
+    TaskQueue(uint32_t size);
+    virtual ~TaskQueue();
 
-    TaskPool(const TaskPool &) = delete;
-    TaskPool(const TaskPool &&) = delete;
-    TaskPool & operator = (const TaskPool &) = delete;
-    TaskPool & operator = (const TaskPool &&) = delete;
+    TaskQueue(const TaskQueue &) = delete;
+    TaskQueue(const TaskQueue &&) = delete;
+    TaskQueue & operator = (const TaskQueue &) = delete;
+    TaskQueue & operator = (const TaskQueue &&) = delete;
 
     /**
      * @desc 设置task到来后的通知方式
@@ -60,4 +60,4 @@ private:
 
 } /* namespace ef */
 
-#endif /* __COMMON_TASK_POOL_H__ */
+#endif /* __COMMON_TASK_QUEUE_H__ */
