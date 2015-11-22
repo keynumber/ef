@@ -12,7 +12,7 @@
 
 namespace ef {
 
-Poller::Poller(int max_event_num)
+Poller::Poller(uint32_t max_event_num)
     : _max_event_num(max_event_num)
     , _event_num(0)
     , _cur_index(0)
@@ -57,7 +57,7 @@ int Poller::GetEvent(uint64_t *key, uint32_t *events)
 
 int Poller::Wait(int time_ms)
 {
-    return epoll_wait(_epoll_fd, &_events[0], _max_event_num, time_ms);
+    return epoll_wait(_epoll_fd, &_events[0], static_cast<int>(_max_event_num), time_ms);
 }
 
 int Poller::Ctrl(int fd, uint64_t key, int op, uint32_t events)
