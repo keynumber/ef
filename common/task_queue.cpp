@@ -16,13 +16,13 @@ TaskQueue::TaskQueue()
 {
 }
 
-bool TaskQueue::Initialize(uint32_t size, bool blocked, bool edge_trigger)
+bool TaskQueue::Initialize(uint32_t size, bool blocked)
 {
     _queue = new FixQueue<void*>(size);
     assert(_queue != nullptr);
     _notifier = new EventNotifier();
     assert(_notifier != nullptr);
-    return _notifier->Initialize(blocked, edge_trigger);
+    return _notifier->Initialize(blocked, false);
 }
 
 TaskQueue::~TaskQueue()
@@ -49,22 +49,20 @@ bool TaskQueue::Put(void* task)
     return ret;
 }
 
-int TaskQueue::Take(void** task)
+void * TaskQueue::Take()
 {
-    int ret = 0;
+    void * ret = nullptr;
     _lock.lock();
     if (_queue->empty()) {
-        *task = nullptr;
+        return ret;
     } else {
-        *task = _queue->front();
+        ret = _queue->front();
         _queue->pop();
     }
     _lock.unlock();
 
-    if (*task) {
-        ret = _notifier->GetEvent();
-    }
-    return ret - 1;
+    _notifier->GetEvent();
+    return ret;
 }
 
 int TaskQueue::GetNotifier() const
