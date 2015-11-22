@@ -25,6 +25,7 @@ Poller::Poller(int max_event_num)
 Poller::~Poller()
 {
     delete []_events;
+    close(_epoll_fd);
 }
 
 int Poller::Add(int fd, uint64_t key, uint32_t events)
