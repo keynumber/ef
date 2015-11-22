@@ -10,18 +10,17 @@
 
 #include <mutex>
 
-#include "data_struct/fix_queue.h"
-
 namespace ef {
 
 class EventNotifier;
+template<class T> class FixQueue;
 
 /**
  * @desc 线程安全,固定长度的任务池,采用eventfd进行通知
  */
 class TaskQueue {
 public:
-    TaskQueue(uint32_t size);
+    TaskQueue();
     virtual ~TaskQueue();
 
     TaskQueue(const TaskQueue &) = delete;
@@ -34,7 +33,7 @@ public:
      * @param blocked 是否已阻塞方式通知
      * @param edge_trigger 是否边沿触发方式通知
      */
-    bool Initialize(bool blocked, bool edge_trigger);
+    bool Initialize(uint32_t size, bool blocked, bool edge_trigger);
 
     /**
      * @desc 将任务放入队列,并通知
@@ -53,7 +52,7 @@ public:
     int GetNotifier() const;
 
 private:
-    FixQueue<void*> _queue;
+    FixQueue<void*> *_queue;
     std::mutex _lock;
     EventNotifier * _notifier;
 };
