@@ -12,6 +12,10 @@ class Worker {
 public:
     Worker();
     virtual ~Worker();
+
+    void HandlerRequest(void * task);
+
+    bool Initialize();
 };
 
 } /* namespace ef */
