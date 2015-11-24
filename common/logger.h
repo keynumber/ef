@@ -18,6 +18,7 @@ enum LogLevel {
     kLevelWarn     = 2,
     kLevelInfo     = 3,
     kLevelDebug    = 4,
+    kLevelFrame    = 5,
 };
 
 class Logger {
@@ -37,6 +38,7 @@ public:
     void Warn (const char * format, ...) __attribute__ ((format (printf, 2, 3)));
     void Info (const char * format, ...) __attribute__ ((format (printf, 2, 3)));
     void Debug(const char * format, ...) __attribute__ ((format (printf, 2, 3)));
+    void Frame(const char * format, ...) __attribute__ ((format (printf, 2, 3)));
 
 
 private:

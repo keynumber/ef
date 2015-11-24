@@ -60,6 +60,8 @@ LogLevel Logger::GetLevel(const char * str_level)
         return kLevelInfo;
     } else if (std::string("debug") == str_level) {
         return kLevelDebug;
+    } else if (std::string("Frame") == str_level) {
+        return kLevelFrame;
     }
     return kLevelInfo;
 }
@@ -97,6 +99,7 @@ void Logger::Log(const LogLevel level, const char* format, va_list va)
         case kLevelWarn : memcpy(ptr, "WARN  ", 6); ptr += 6; break;
         case kLevelInfo : memcpy(ptr, "INFO  ", 6); ptr += 6; break;
         case kLevelDebug: memcpy(ptr, "DEBUG ", 6); ptr += 6; break;
+        case kLevelFrame: memcpy(ptr, "FRAME ", 6); ptr += 6; break;
         default         : memcpy(ptr, "OTHER ", 6); ptr += 6; break;
     }
 
@@ -130,6 +133,7 @@ LOGGER_DEF(Err  )
 LOGGER_DEF(Warn )
 LOGGER_DEF(Info )
 LOGGER_DEF(Debug)
+LOGGER_DEF(Frame)
 
 } /* namespace ef */
 
