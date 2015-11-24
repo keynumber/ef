@@ -11,11 +11,6 @@
 
 namespace ef {
 
-struct ListenInfo {
-    int fd;
-    unsigned short port;
-};
-
 enum DataType {
     kTcpData     = 0,
     kUdpData     = 1,
@@ -34,6 +29,8 @@ enum Cmd {
 
     // control to me
     kControlStop            = 5,
+
+    kControlAddClient       = 6,    // control线程接受客户端连接,并交由IoHandler处理
 };
 
 /**
@@ -45,17 +42,17 @@ enum Cmd {
  *          4. worker通知iohandler访问外部server
  */
 struct TaskData {
-    int      fd_id;         // io handler发送给worker的数据,worker回包时确定发送到哪个client
+    uint32_t fd_id;         // io handler发送给worker的数据,worker回包时确定发送到哪个client
 
     uint16_t headler_id;    // 1. 当io handler给worker发数据时,io handler id,用于worker回包
                             // 2. 当worker请求外部server时,worker id,io handler返回外部回包到指定worker
     uint16_t data_type;
     uint16_t cmd;
 
-    uint16_t  connect_id;    // worker连接外部server使用,不同的connect_id决定了不同的连接
+    uint16_t connect_id;    // worker连接外部server使用,不同的connect_id决定了不同的连接
     uint32_t extern_ip;
     uint16_t extern_port;
-    uint16_t local_port;
+    uint16_t local_port;    // 接受连接的listen port
 
     uint32_t msg_len;
     char msg[0];

@@ -11,6 +11,10 @@
 namespace ef {
 
 struct DefaultConf {
+    static const uint32_t kIoHandlerNum = 1;
+    static const uint32_t kWorkerNum = 1;
+    static const uint32_t kQueueSize = 1;
+
     static const int kListenBackLog = 1024;
 
     static const uint32_t kMaxLogFileSize            = 50 * 1024 * 1024;
@@ -21,6 +25,8 @@ struct DefaultConf {
 
     static const uint32_t kBufferBlockSize           = 1024;
     static const uint32_t kReadBufferSize            = 1024 * 1024;
+
+    static const uint32_t kPollerMaxEventNum      = 1024;
 };
 
 } /* namespace ef*/

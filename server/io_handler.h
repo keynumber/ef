@@ -27,7 +27,7 @@ public:
     IoHandler();
     virtual ~IoHandler();
 
-    bool Initialize(const ListenInfo * listen_fds, uint32_t size);
+    bool Initialize();
     void Run();
     bool HandleAccept();    // 外部client连接请求
     bool HanderClient();    // client读写请求

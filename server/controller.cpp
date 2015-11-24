@@ -5,35 +5,47 @@
 
 #include "controller.h"
 
+#include <cassert>
+#include <cstring>
 #include <cstdio>
 
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <arpa/inet.h>
 
-#include "common/util.h"
 #include "common/c_map.h"
 #include "common/io_wrapper.h"
 #include "common/logger.h"
 #include "common/mem_pool.h"
+#include "common/poller.h"
+#include "common/task_pool.h"
+#include "common/util.h"
+#include "common_data.h"
+#include "io_handler.h"
+#include "worker.h"
+
 
 namespace ef {
 
 CMap gConfigureMap;
 MemPool gMemPool;
 
-Controller::Controller() : _listen_sockets(nullptr), _listen_size(0)
+Controller::ListenFdInfo::~ListenFdInfo() {
+    if (fd >= 0) {
+        safe_close(fd);
+    }
+}
+
+Controller::Controller()
 {
 }
 
 Controller::~Controller()
 {
+    // TODO
     if (_listen_sockets) {
-        for (uint32_t i = 0; i < _listen_size; ++i) {
-            safe_close(_listen_sockets[i].fd);
-        }
-
         delete [] _listen_sockets;
+        _listen_sockets = nullptr;
     }
 }
 
@@ -59,20 +71,64 @@ bool Controller::Initialize(const char* server_name, const char* configure_file)
         printf("logger initialize failed, errmsg: %s\n", Logger::GetErrMsg().c_str());
     }
 
+    int poller_max_event = gConfigureMap["poller_max_event"].as<int>(DefaultConf::kPollerMaxEventNum);
+    assert(poller_max_event > 0);
+    _poller = new Poller(poller_max_event);
+    assert(_poller);
+
     // 初始化监听端口
+
+    // TODO different port bind different protocol(unpack function)
+    // 每个监听端口最好能独立的包完整性检查,每个访问外部server的端口,最好也能绑定独立协议
     const Value & val = gConfigureMap["listen"];
-    _listen_size = val.size();
-    _listen_sockets = new ListenInfo[_listen_size];
+    _listen_size = val.size() + 128;
+    _listen_sockets = new ListenFdInfo[_listen_size];
     for (uint32_t i=0; i<_listen_size; ++i)
     {
-        _listen_sockets[i].port = val[i]["port"].as<unsigned>(0);
-        _listen_sockets[i].fd = ListenTcpV4(_listen_sockets[i].port);
-        if (_listen_sockets[i].fd < 0) {
+        unsigned int port = val[i]["port"].as<unsigned>(0);
+        int fd = ListenTcpV4(port);
+        if (fd < 0) {
+            FillErrmsg("listen failed: ", errno);
+            return false;
+        }
+
+        _listen_sockets[fd].port = port;
+        _listen_sockets[fd].fd = fd;
+
+        if (_poller->Add(fd, (uint64_t)fd, EPOLLIN)) {
+            FillErrmsg("listen fd add to poller failed: ", errno);
             return false;
         }
     }
 
-    // initialize io handler and worker
+    _io_handler_num = gConfigureMap["server"]["io_handler_num"].as<uint32_t>(DefaultConf::kIoHandlerNum);
+    _io_handers = new IoHandler[_io_handler_num];
+    assert(_io_handers);
+    for (uint32_t i=0; i<_io_handler_num; ++i) {
+        if(!_io_handers[i].Initialize()) {
+            _errmsg = "io handler initialize failed";
+            return false;
+        }
+    }
+
+    _worker_num = gConfigureMap["server"]["worker_num"].as<uint32_t>(DefaultConf::kWorkerNum);
+    _workers = new Worker[_worker_num];
+    assert(_workers);
+    for (uint32_t i=0; i<_worker_num; ++i) {
+        if(!_workers[i].Initialize()) {
+            _errmsg = "initialize workers failed";
+            return false;
+        }
+    }
+
+    int pool_size = _io_handler_num + _worker_num;
+    int queue_size = gConfigureMap["server"]["queue_size"].as<uint32_t>(DefaultConf::kQueueSize);
+    _task_pool = new TaskPool();
+    assert(_task_pool);
+    if (!_task_pool->Initialize(pool_size, queue_size)) {
+        LOG.Err("task poll initialize failed");
+        return false;
+    }
 
     return true;
 }
@@ -115,7 +171,53 @@ int Controller::ListenTcpV4(unsigned short port)
 
 void Controller::Run()
 {
-    sleep(10000000);
+    while(true) {
+        int num = _poller->Wait(-1);
+        while (num--) {
+            int listen_fd;
+            uint64_t u64;
+            uint32_t events;
+            _poller->GetEvent(&u64, &events);
+            if (events != EPOLLIN) {
+                continue;
+            }
+
+            listen_fd = static_cast<int>(u64);
+
+            // TODO 目前暂时只支持TCP
+
+            struct sockaddr_in  socket_addr;
+            socklen_t socket_addr_len = sizeof(sockaddr_in);
+            int client = accept(listen_fd, (struct sockaddr *)&socket_addr, &socket_addr_len);
+
+            // TODO 如果是大量短链接的话,比较.......
+            TaskData * task = static_cast<TaskData*>(gMemPool.Malloc(sizeof(TaskData)));
+            if (!task) {
+                LOG.Err("alloc task data failed, close client connection, client address: %u:%u",
+                        socket_addr.sin_addr.s_addr, socket_addr.sin_port);
+                safe_close(client);
+                continue;
+            }
+
+            uint32_t io_handler_id;
+            uint32_t client_id;
+            SelectIoHandler(client, &io_handler_id, &client_id);
+
+            task->cmd = kControlAddClient;
+            task->data_type = kTcpData;
+            task->extern_ip = socket_addr.sin_addr.s_addr;
+            task->extern_port = socket_addr.sin_port;
+            task->local_port = _listen_sockets[listen_fd].port;
+            task->fd_id = client_id;
+            task->headler_id = io_handler_id;
+
+            if (!_task_pool->Put(io_handler_id, static_cast<void*>(task))) {
+                LOG.Info("add task to pool failed");
+                safe_close(client);
+                continue;
+            }
+        }
+    }
 }
 
 void Controller::FillErrmsg(const char * extra, int errorno)
@@ -129,6 +231,12 @@ void Controller::FillErrmsg(const char * extra, int errorno)
 const std::string& Controller::GetErrMsg() const
 {
     return _errmsg;
+}
+
+void Controller::SelectIoHandler(int fd, uint32_t *io_handler_id, uint32_t *fd_id)
+{
+    *io_handler_id = (uint32_t)fd % _io_handler_num;
+    *fd_id = (uint32_t)fd / _io_handler_num;
 }
 
 } /* namespace ef */
