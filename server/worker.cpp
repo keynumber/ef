@@ -18,4 +18,9 @@ Worker::~Worker()
     // TODO Auto-generated destructor stub
 }
 
+bool Worker::Initialize()
+{
+    return true;
+}
+
 } /* namespace ef */
