@@ -19,7 +19,7 @@ namespace ef {
  */
 class Poller {
 public:
-    Poller(uint32_t max_event_num = DEFAULT_POLLER_MAX_EVENT_NUM);
+    Poller(uint32_t max_event_num);
     virtual ~Poller();
 
     Poller(const Poller&) = delete;
