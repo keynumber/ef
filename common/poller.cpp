@@ -57,7 +57,11 @@ int Poller::GetEvent(uint64_t *key, uint32_t *events)
 
 int Poller::Wait(int time_ms)
 {
-    return epoll_wait(_epoll_fd, &_events[0], static_cast<int>(_max_event_num), time_ms);
+    int ret;
+    do {
+        ret = epoll_wait(_epoll_fd, &_events[0], static_cast<int>(_max_event_num), time_ms);
+    } while (unlikely(ret < 0 && errno == EINTR));
+    return ret;
 }
 
 int Poller::Ctrl(int fd, uint64_t key, int op, uint32_t events)
