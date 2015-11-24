@@ -12,11 +12,12 @@
 
 namespace ef {
 
-Poller::Poller(uint32_t max_event_num)
+Poller::Poller(int max_event_num)
     : _max_event_num(max_event_num)
     , _event_num(0)
     , _cur_index(0)
 {
+    assert(max_event_num > 0);
     _epoll_fd = epoll_create(1);
     assert(_epoll_fd >= 0);
     _events =  new struct epoll_event[max_event_num];
