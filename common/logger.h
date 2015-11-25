@@ -50,8 +50,12 @@ private:
     int _line;
 };
 
-
-#define LOG ef::Logger(__FILE__, __LINE__)
+#define LogFatal(format, ...)   ef::Logger(__FILE__, __LINE__).Fatal(format, ##__VA_ARGS__)
+#define LogErr(format, ...)     ef::Logger(__FILE__, __LINE__).Err(format, ##__VA_ARGS__)
+#define LogWarn(format, ...)    ef::Logger(__FILE__, __LINE__).Warn(format, ##__VA_ARGS__)
+#define LogInfo(format, ...)    ef::Logger(__FILE__, __LINE__).Info(format, ##__VA_ARGS__)
+#define LogDebug(format, ...)   ef::Logger(__FILE__, __LINE__).Debug(format, ##__VA_ARGS__)
+#define LogFrame(format, ...)   ef::Logger(__FILE__, __LINE__).Frame(format, ##__VA_ARGS__)
 
 } /* namespace ef */
 

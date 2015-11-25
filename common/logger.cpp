@@ -141,18 +141,18 @@ LOGGER_DEF(Frame)
 
 int main(int argc, char *argv[])
 {
-    if (!ef::Logger::Initialize("/test_logger", 1000, 5, ef::kLevelInfo))
+    if (!ef::Logger::Initialize("test_logger", 1000, 5, ef::kLevelInfo))
     {
         printf("Initialize failed, errmsg: %s\n", ef::Logger::GetErrMsg().c_str());
         return -1;
     }
 
     for (int i = 0; i < 100; ++i) {
-        LOG.Info("this is a warn message: %d\n", i);
-        LOG.Debug("this is a debug message: %d\n", i);
+        LogInfo("this is a warn message: %d\n", i);
+        LogDebug("this is a debug message: %d\n", i);
     }
-    LOG.Err("this is a debug message: %13241235d\n");
-    LOG.Err("this is a debug message: %d\n");
+    LogErr("this is a debug message: %13241235d\n");
+    LogErr("this is a debug message: %d\n");
 
     // printf core 问题
     return 0;
