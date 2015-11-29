@@ -59,8 +59,10 @@ bool IoHandler::Initialize()
 
 void IoHandler::Run()
 {
-    while (true) {
-    }
 }
 
 } /* namespace ef */
+
+bool IoHandler::HanderClient()
+{
+}

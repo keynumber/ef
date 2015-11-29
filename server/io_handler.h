@@ -27,11 +27,13 @@ public:
     IoHandler();
     virtual ~IoHandler();
 
-    bool Initialize();
+    bool Initialize(int handler_id);
     void Run();
-    bool HandleAccept();    // 外部client连接请求
-    bool HanderClient();    // client读写请求
-    bool HanderWorker();    // worker的请求
+
+    bool HanderClient();    // client请求
+    bool HanderWorker();    // worker的请求外部server
+    bool HanderController();    // controller的接收client连接或者控制
+    bool HanderTaskPool();    // controller的请求
 
     void ClearUnuseConnection();        // 清除长时间没有使用的连接
 
@@ -42,13 +44,8 @@ public:
 
 private:
     enum PollerFdType{
-        kTcpListenFd    = 0,      // accept连接,并添加到poller继续监听
         kTcpClientFd    = 1,      // read数据,并路由到worker
-
-        kUdpListenFd    = 2,      // accept连接,并添加到poller继续监听
         kUdpClientFd    = 3,      // read数据,并路由到worker
-
-        kUnixListenFd   = 4,      // accept连接,并添加到poller继续监听
         kUnixCLientFd   = 5,      // read数据,并路由数据路由到worker
 
         kTaskPoolFd     = 6,      // woker处理回包,将接收到的数据发送到对应的client,client对应的fd由TaskData保存
@@ -72,6 +69,17 @@ private:
             assert(buffer);
         }
 
+        void Clear()
+        {
+            if (fd >= 0) {
+                safe_close(fd);
+            }
+
+            if (buffer) {
+                buffer->Clear();
+            }
+        }
+
         virtual ~FdInfo() {
             if (buffer) {
                 delete buffer;
@@ -83,13 +91,13 @@ private:
             }
         }
 
-        int        fd               = -1;
-        uint32_t   fd_type          = 0;           //   PollerFdType
-        uint32_t   extern_ip        = 0;
-        uint16_t   extern_port      = 0;
-        uint16_t   local_port       = 0;
-        void       *ext             = nullptr;
-        time_t     last_active_time = 0;
+        int          fd               = -1;
+        uint32_t     fd_type          = 0;           //   PollerFdType
+        uint32_t     extern_ip        = 0;
+        uint16_t     extern_port      = 0;
+        uint16_t     local_port       = 0;
+        void         *ext             = nullptr;
+        time_t       last_active_time = 0;
         SocketBuffer *buffer        = nullptr;
     };
 
@@ -101,6 +109,12 @@ private:
 
     uint32_t _read_buf_size;
     char *_read_buf;
+
+    // 访问外部server,woker需要将包完整性检测函数传过来,放入ext中
+    // listen socket接受的连接呢?也穿进来,放入ext
+
+
+    // std::unordered_map<extern_server_addr, related_info> _extern_server;    // 外部server对应的包长度等
 
     std::string _errmsg;
 };

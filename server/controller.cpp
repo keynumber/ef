@@ -21,9 +21,9 @@
 #include "common/task_pool.h"
 #include "common/util.h"
 #include "common_data.h"
+#include "debug.h"
 #include "io_handler.h"
 #include "worker.h"
-
 
 namespace ef {
 
@@ -71,10 +71,14 @@ bool Controller::Initialize(const char* server_name, const char* configure_file)
         printf("logger initialize failed, errmsg: %s\n", Logger::GetErrMsg().c_str());
     }
 
+    LogInfo("Logger initialize succeed\n");
+
     int poller_max_event = gConfigureMap["poller_max_event"].as<int>(DefaultConf::kPollerMaxEventNum);
     assert(poller_max_event > 0);
     _poller = new Poller(poller_max_event);
     assert(_poller);
+
+    LogInfo("Poller initialize succeed\n");
 
     // 初始化监听端口
 
@@ -126,7 +130,7 @@ bool Controller::Initialize(const char* server_name, const char* configure_file)
     _task_pool = new TaskPool();
     assert(_task_pool);
     if (!_task_pool->Initialize(pool_size, queue_size)) {
-        LOG.Err("task poll initialize failed");
+        LogErr("task poll initialize failed");
         return false;
     }
 
@@ -193,7 +197,7 @@ void Controller::Run()
             // TODO 如果是大量短链接的话,比较.......
             TaskData * task = static_cast<TaskData*>(gMemPool.Malloc(sizeof(TaskData)));
             if (!task) {
-                LOG.Err("alloc task data failed, close client connection, client address: %u:%u",
+                LogErr("alloc task data failed, close client connection, client address: %u:%u\n",
                         socket_addr.sin_addr.s_addr, socket_addr.sin_port);
                 safe_close(client);
                 continue;
@@ -211,13 +215,20 @@ void Controller::Run()
             task->fd_id = client_id;
             task->headler_id = io_handler_id;
 
+            LOGDEBUG("accept client connection: %u:%u", task->extern_ip, task->extern_port);
+
             if (!_task_pool->Put(io_handler_id, static_cast<void*>(task))) {
-                LOG.Info("add task to pool failed");
+                LogInfo("add task to pool failed");
                 safe_close(client);
                 continue;
             }
         }
     }
+}
+
+bool Controller::LoadNetCompleteFunc()
+{
+    return true;
 }
 
 void Controller::FillErrmsg(const char * extra, int errorno)

@@ -9,6 +9,7 @@ INC = -I.
 OBJS = ef.o 					\
 	   server/controller.o 		\
 	   server/io_handler.o 		\
+	   server/worker.o 			\
 	   common/mem_pool.o 		\
 	   common/poller.o			\
 	   common/logger.o			\

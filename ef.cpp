@@ -15,6 +15,7 @@ int main(int argc, char *argv[]) {
 
     ef::Controller controller;
     controller.Initialize("echosvr", argv[1]);
+    controller.Run();
 
     return 0;
 }

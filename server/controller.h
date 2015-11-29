@@ -40,14 +40,18 @@ private:
     // 让(fd / io_handler_num)作为fd在IoHandler中的下下标,
     // 从而得以充分利用每个空间
     void SelectIoHandler(int fd, uint32_t *io_handler_id, uint32_t *fd_id);
+    void LoadNetCompleteFunc();
 
 private:
     struct ListenFdInfo {
         int fd = -1;
         unsigned short port = 0;
         ListenFdInfo() = default;
+        ListenFdInfo(const ListenFdInfo &) = delete;
+        ListenFdInfo& operator=(const ListenFdInfo &) = delete;
         virtual ~ListenFdInfo();
     };
+
 private:
     std::string _server_name;
     std::string _configure_file;

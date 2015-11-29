@@ -12,6 +12,12 @@ namespace ef {
 
 std::string JoinPath(const std::string &p1, const std::string &p2);
 
+
+inline std::string IpToString(int ip)
+{
+    return "";
+}
+
 } /* namespace ef */
 
 #endif /* __COMMON_UTIL_H__ */
